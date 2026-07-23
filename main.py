@@ -178,7 +178,13 @@ async def main():
     print(f"💡 No Minecraft Bedrock, execute o comando: /connect localhost:{G_ARGS.port}")
     print("=" * 70)
 
-    async with websockets.serve(handler, config.HOST, G_ARGS.port):
+    async with websockets.serve(
+        handler,
+        config.HOST,
+        G_ARGS.port,
+        ping_interval=None,
+        ping_timeout=None
+    ):
         await asyncio.Future()  # Manter o servidor rodando indefinidamente
 
 

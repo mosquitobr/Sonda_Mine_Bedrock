@@ -80,31 +80,18 @@ Através de uma arquitetura em Python baseada em conexões **WebSocket**, o sist
 
 ---
 
-## 🚀 Início Rápido (Quick Start)
+## 🚀 Instalação e Execução (Início Rápido)
 
-### 1. Obter o Projeto
-Baixe o arquivo ZIP do repositório no GitHub ou clone utilizando o Git:
-```bash
-git clone https://github.com/mosquitobr/Sonda_Mine_Bedrock.git
-cd Sonda_Mine_Bedrock/comissionamento/main
-```
+Para obter um guia passo a passo detalhado sobre como preparar o ambiente, configurar o Minecraft Bedrock (incluindo permissões e opções de perfil de rede), importar os pacotes de comportamento e rodar o servidor, consulte o nosso manual completo:
 
-### 2. Instalar Dependências
-```bash
-pip install -r requirements.txt
-```
+> 📖 **[Clique aqui para acessar o MANUAL.md completo](MANUAL.md)**
 
-### 3. Iniciar o Servidor de Comissionamento
-Execute o script informando as coordenadas de ancoragem desejadas (ou use o padrão):
-```bash
-python main.py --anchor-x -217 --anchor-z 300 --water-y 62
-```
-
-### 4. Conectar no Minecraft Bedrock
-Abra o chat no Minecraft (com Cheats habilitados) e digite:
-```text
-/connect localhost:19131
-```
+### Visão Geral de Execução:
+Após a clonagem do repositório ou extração do arquivo `.ZIP` na pasta raiz do seu computador:
+1. Abra o terminal na raiz do projeto (`Sonda_Mine_Bedrock/` ou `Sonda_Mine_Bedrock-main/`).
+2. Instale os pré-requisitos (`pip install -r requirements.txt`).
+3. Inicie o servidor WebSocket (`python main.py --anchor-x <X> --anchor-z <Z> --water-y <Y>`).
+4. Conecte in-game usando o comando `/connect localhost:19131` no chat do Minecraft.
 
 ---
 

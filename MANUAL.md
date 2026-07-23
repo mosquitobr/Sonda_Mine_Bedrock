@@ -25,15 +25,15 @@ Se você é novo no GitHub ou não possui experiência técnica prévia, siga as
 2. Clique no botão verde rotulado **"Code"** (localizado no canto superior direito da lista de arquivos).
 3. No menu suspenso que aparece, clique na opção **"Download ZIP"**.
 4. Quando o download for concluído, abra a pasta de Downloads do seu computador, clique com o botão direito sobre o arquivo `Sonda_Mine_Bedrock-main.zip` e escolha **"Extrair Tudo..."**.
-5. Abra a pasta extraída `Sonda_Mine_Bedrock-main` e navegue até a subpasta:
-   `comissionamento/main/`
+5. Abra a pasta extraída **`Sonda_Mine_Bedrock-main`**. O arquivo `main.py` e a pasta `assets/` estarão diretamente na raiz desta pasta.
 
 ### Opção B: Clonagem via Git Terminal (Para Desenvolvedores)
 Se você já utiliza o Git instalado em seu sistema:
 ```powershell
 git clone https://github.com/mosquitobr/Sonda_Mine_Bedrock.git
-cd Sonda_Mine_Bedrock/comissionamento/main
+cd Sonda_Mine_Bedrock
 ```
+*(Nota: Os arquivos do projeto estarão diretamente na raiz da pasta `Sonda_Mine_Bedrock`)*
 
 ---
 
@@ -48,15 +48,16 @@ O sistema necessita do Python (versão 3.10 ou superior) para executar o servido
    ```
    *Se o Python estiver instalado, aparecerá algo como `Python 3.10.x` ou superior. Caso não tenha o Python, baixe a versão oficial gratuita na [Microsoft Store](https://apps.microsoft.com) ou em [python.org](https://www.python.org).*
 
-3. Instale a biblioteca necessária (`websockets`) digitando no terminal (dentro da pasta `comissionamento/main`):
+3. Instale a biblioteca necessária (`websockets`) digitando no terminal (na pasta raiz onde se encontra o arquivo `requirements.txt`):
    ```powershell
    pip install -r requirements.txt
    ```
 
 ### 2.2 Configurar o Mundo no Minecraft Bedrock
-Antes de importar e construir o navio, certifique-se das seguintes opções no seu mundo:
-* **Permitir Trapaças (Allow Cheats):** Mantenha `ATIVADO` nas Opções do Mundo (necessário para que o script possa enviar blocos).
+Antes de importar e construir o navio, certifique-se das seguintes opções no seu mundo e perfil:
+* **Permitir Trapaças (Allow Cheats):** Mantenha `ATIVADO` nas Opções do Mundo (necessário para que o script possa enviar comandos e blocos).
 * **Modo de Jogo:** `Criativo` (recomendado para voar e explorar a embarcação).
+* **Desativar WebSockets Criptografados:** No menu principal de Opções do Minecraft Bedrock, acesse **Opções > Geral > Perfil** (ou **Settings > Profile**) e certifique-se de que a opção **"Exigir WebSockets Criptografados"** (Require Encrypted WebSockets) esteja **DESATIVADA**. Como o servidor WebSocket Python local roda em `ws://` (sem criptografia TLS), o jogo impedirá a conexão silenciosamente se essa opção estiver ativa.
 
 ---
 
@@ -65,7 +66,7 @@ Antes de importar e construir o navio, certifique-se das seguintes opções no s
 O arquivo `sonda_bp.mcpack` contém o pacote de comportamentos que adiciona a tripulação técnica (aldeões caracterizados com capacetes e coletes de proteção industrial EPI).
 
 ### Método do Duplo-Clique (Simples e Direto):
-1. Abra a pasta `comissionamento/main/assets/` no Explorador de Arquivos do Windows.
+1. Abra a pasta `assets/` na raiz do projeto no seu Explorador de Arquivos do Windows.
 2. Localize o arquivo **`sonda_bp.mcpack`**.
 3. **Dê um DUPLO-CLIQUE diretamente sobre o arquivo `sonda_bp.mcpack`**.
 4. O Windows iniciará automaticamente o **Minecraft Bedrock Edition** e exibirá no topo da tela do jogo a mensagem:
@@ -95,7 +96,7 @@ Com o mundo aberto no Minecraft Bedrock, abra o chat (pressione a tecla `T` ou `
 ## ⚙️ 5. Execução do Servidor e Deploy Automatizado
 
 ### 5.1 Iniciar o Servidor Python
-No seu PowerShell / Prompt de Comando, posicionado na pasta `comissionamento/main`, execute:
+No seu PowerShell / Prompt de Comando, posicionado na raiz da pasta do projeto (onde está o arquivo `main.py`), execute:
 ```powershell
 python main.py
 ```
