@@ -80,44 +80,42 @@ O arquivo `sonda_bp.mcpack` contém o pacote de comportamentos que adiciona a tr
 
 ---
 
-## 📍 4. Configuração da Área de Carregamento (Tickingarea)
+## ⚙️ 4. Execução do Servidor e Deploy Automatizado
 
-O Navio-Sonda Classe Aq é uma estrutura monumental de 140 blocos de comprimento e 55m de altura. Para impedir que partes do navio falhem devido ao descarregamento de chunks distantes no Minecraft:
-
-### Como Aplicar o Comando no Chat In-Game:
-Com o mundo aberto no Minecraft Bedrock, abra o chat (pressione a tecla `T` ou `Enter`) e execute:
-```text
-/tickingarea add -247 0 209 -187 128 391 sonda_area
-```
-*Este comando garante que toda a área da água e leito marinho onde o navio será montado permanecerá carregada na memória do jogo.*
-
----
-
-## ⚙️ 5. Execução do Servidor e Deploy Automatizado
-
-### 5.1 Iniciar o Servidor Python
-No seu PowerShell / Prompt de Comando, posicionado na raiz da pasta do projeto (onde está o arquivo `main.py`), execute:
+### 4.1 Iniciar o Servidor Python
+No seu PowerShell / Prompt de Comando, posicionado na raiz da pasta do projeto (onde está o arquivo `main.py`), execute informando suas coordenadas livres de ancoragem desejadas:
 ```powershell
-python main.py
+python main.py --anchor-x <COORD_X> --anchor-z <COORD_Z> --water-y <COORD_Y>
 ```
-O servidor exibirá a mensagem:
-`[SERVIDOR ATIVO] Servidor pronto. Aguardando conexão do Minecraft na porta 19131...`
 
-### 5.2 Conectar no Minecraft e Iniciar a Montagem
+#### Exemplos de Inicialização:
+*   **Com as Coordenadas Padrões:**
+    ```powershell
+    python main.py --anchor-x -217 --anchor-z 300 --water-y 62
+    ```
+*   **Com Coordenadas Customizadas:**
+    ```powershell
+    python main.py --anchor-x -365 --anchor-z 762 --water-y 62
+    ```
+
+> 💡 **Nota de Funcionamento:** Ao rodar o script com as suas coordenadas, a primeira fase ("1. Oceano & Leito Marinho") fará automaticamente a limpeza tridimensional e o reset do leito marinho correspondente àquela área de ancoragem antes de erguer a sonda.
+
+### 4.2 Conectar no Minecraft e Iniciar a Montagem
 1. Volte para a tela do **Minecraft Bedrock** no seu mundo.
-2. Abra o chat in-game (tecla `T`) e digite o comando de conexão:
+2. Abra o chat in-game (tecla `T` ou `Enter`) e digite o comando de conexão:
    ```text
    /connect localhost:19131
    ```
 3. Pressione `Enter`. O script começará instantaneamente a enviar e construir as 8 fases da embarcação em tempo real!
-4. Para se teleportar direto para o convés do navio:
+4. Ao final da montagem, o script enviará um comando in-game para teleportar seu jogador automaticamente para a ponte da sonda. Caso queira se teleportar manualmente a qualquer momento, execute:
    ```text
-   /tp @s -217 75 300
+   /tp @s <COORD_X> 75 <COORD_Z>
    ```
+   *(Substitua `<COORD_X>` e `<COORD_Z>` pelas coordenadas informadas na inicialização, ex: `/tp @s -365 75 762`)*
 
 ---
 
-## 🔄 6. Reconstrução Rápida (Rebuild)
+## 🔄 5. Reconstrução Rápida (Rebuild)
 
 Se você fizer modificações ou quiser restaurar o navio ao estado original sem fechar nada:
 1. Abra o chat do Minecraft.
@@ -125,15 +123,15 @@ Se você fizer modificações ou quiser restaurar o navio ao estado original sem
    ```text
    rebuild
    ```
-3. O script reiniciará o ciclo de montagem procedural automaticamente!
+3. O script reiniciará o ciclo de montagem e limpeza procedural automaticamente!
 
 ---
 
-## 🔍 7. Solução de Problemas (FAQ para Leigos)
+## 🔍 6. Solução de Problemas (FAQ para Leigos)
 
 * **Problema: Dobrei o clique no `sonda_bp.mcpack` mas o Minecraft não abriu.**
   * *Solução:* Certifique-se de que o Minecraft Bedrock Edition está instalado no Windows. Se necessário, abra o Minecraft primeiro, vá em Opções -> Armazenamento e importe o pacote.
 * **Problema: Apareceu "Conexão Recusada" ao digitar `/connect localhost:19131`.**
   * *Solução:* Verifique se a janela do terminal com o `python main.py` ainda está aberta. Se a porta estiver presa, feche o terminal e abra novamente.
 * **Problema: Os blocos pararam de aparecer na metade da construção.**
-  * *Solução:* Lembre-se de rodar o comando de `/tickingarea` do Passo 4 para manter a área do oceano carregada.
+  * *Solução:* Certifique-se de que seu jogador permaneceu próximo ao local de ancoragem durante o processo. Se os chunks descarregarem, aproxime-se da sonda e digite `rebuild` no chat do jogo.

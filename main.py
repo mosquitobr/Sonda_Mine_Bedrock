@@ -61,12 +61,24 @@ async def send_command(websocket, cmd: str):
     await asyncio.sleep(config.COMMAND_DELAY)
 
 
+def get_terminal_progress_bar(pct: float, length: int = 30) -> str:
+    filled = int(round(pct / 100.0 * length))
+    bar = "█" * filled + "░" * (length - filled)
+    return f"[{bar}] {pct:5.1f}%"
+
+
+def get_minecraft_progress_bar(pct: float, length: int = 10) -> str:
+    filled = int(round(pct / 100.0 * length))
+    bar = "■" * filled + "□" * (length - filled)
+    return f"[{bar}] {pct:.0f}%"
+
+
 async def send_batch(websocket, cmds, batch_name: str, batch_size: int = None):
     if batch_size is None:
         batch_size = config.BATCH_SIZE
+    total = len(cmds)
 
-    print(f"\n[BUILD] Iniciando etapa: {batch_name} ({len(cmds)} comandos)...")
-    for i in range(0, len(cmds), batch_size):
+    for i in range(0, total, batch_size):
         chunk = cmds[i:i + batch_size]
         for cmd in chunk:
             await send_command(websocket, cmd)
@@ -74,10 +86,18 @@ async def send_batch(websocket, cmds, batch_name: str, batch_size: int = None):
 
         pct = build_state.progress_pct()
         elapsed = time.time() - build_state.start_time
-        print(f"  [{pct:5.1f}%] {batch_name} - enviados {build_state.sent_commands}/{build_state.total_commands} (Tempo decorrido: {elapsed:.1f}s)")
+        bar = get_terminal_progress_bar(pct)
+        print(f"\r  {bar} - {batch_name} - {build_state.sent_commands}/{build_state.total_commands} comandos (Tempo: {elapsed:.1f}s)", end="", flush=True)
 
     build_state.checkpoint(batch_name)
-    print(f"[OK] Etapa '{batch_name}' concluída com sucesso!")
+    
+    # Envia barra de progresso do Minecraft ao final de cada etapa
+    pct = build_state.progress_pct()
+    mc_bar = get_minecraft_progress_bar(pct)
+    try:
+        await send_command(websocket, f'tellraw @a {{"rawtext":[{{"text":"§a{mc_bar} - Etapa \'{batch_name}\' concluída!"}}]}}')
+    except Exception:
+        pass
 
 
 async def run_deployment(websocket, anchor_x: int, anchor_z: int, water_y: int):
@@ -117,6 +137,7 @@ async def run_deployment(websocket, anchor_x: int, anchor_z: int, water_y: int):
 
     build_state.total_commands = sum(len(cmds) for _, cmds in all_steps)
     print(f"📊 Total de comandos computados: {build_state.total_commands}")
+    print(f"  {get_terminal_progress_bar(0.0)} - Aguardando início...", end="", flush=True)
 
     # Notificar jogador in-game
     await send_command(websocket, f'tellraw @a {{"rawtext":[{{"text":"§a[Sonda-Deploy] Conexão WebSocket estabelecida! Iniciando montagem do Navio-Sonda..."}}]}}')
@@ -131,6 +152,7 @@ async def run_deployment(websocket, anchor_x: int, anchor_z: int, water_y: int):
     print(f"⚓ Navio-Sonda ancorado nas coordenadas X={ox}, Z={oz}, Y={water_y}")
     print(f"═" * 60)
 
+    # Teleportar e exibir mensagem de conclusão
     await send_command(websocket, f'tellraw @a {{"rawtext":[{{"text":"§6[Sonda-Deploy] Deploy concluído com sucesso! Navio-Sonda Classe Aq pronto para operação."}}]}}')
     await send_command(websocket, f'tp @s {ox} 75 {oz}')
 
@@ -141,22 +163,17 @@ async def handler(websocket):
     # Executar deploy principal
     await run_deployment(websocket, G_ARGS.anchor_x, G_ARGS.anchor_z, G_ARGS.water_y)
 
-    # Loop para aguardar mensagem de 'rebuild' do usuário in-game
-    print("\n[SERVIDOR ATIVO] Servidor pronto. Digite 'rebuild' no chat in-game para reconstruir se necessário.")
+    # Notificar fechamento
     try:
-        async for message in websocket:
-            try:
-                data = json.loads(message)
-                # Verificar se o usuário enviou a palavra rebuild no chat
-                if "body" in data and "message" in data["body"]:
-                    msg_text = str(data["body"]["message"]).strip().lower()
-                    if msg_text == "rebuild":
-                        print("\n[REBUILD REQUISITADO] Comando 'rebuild' recebido via chat in-game. Reiniciando montagem...")
-                        await run_deployment(websocket, G_ARGS.anchor_x, G_ARGS.anchor_z, G_ARGS.water_y)
-            except Exception:
-                pass
-    except websockets.exceptions.ConnectionClosed:
-        print("[CLIENTE DESCONECTADO] Minecraft Bedrock encerrou a conexão.")
+        await send_command(websocket, 'tellraw @a {{"rawtext":[{{"text":"§e[Sonda-Deploy] Deploy finalizado. Encerrando servidor e liberando o terminal..."}}]}}')
+    except Exception:
+        pass
+
+    # Aguardar um momento para garantir o envio das mensagens finais
+    await asyncio.sleep(3)
+
+    print("\n[ENCERRANDO] Conexão finalizada. Servidor desligado com sucesso.")
+    exit_event.set()
 
 
 async def main():
@@ -178,6 +195,9 @@ async def main():
     print(f"💡 No Minecraft Bedrock, execute o comando: /connect localhost:{G_ARGS.port}")
     print("=" * 70)
 
+    global exit_event
+    exit_event = asyncio.Event()
+
     async with websockets.serve(
         handler,
         config.HOST,
@@ -185,7 +205,7 @@ async def main():
         ping_interval=None,
         ping_timeout=None
     ):
-        await asyncio.Future()  # Manter o servidor rodando indefinidamente
+        await exit_event.wait()
 
 
 if __name__ == "__main__":
@@ -193,3 +213,4 @@ if __name__ == "__main__":
         asyncio.run(main())
     except KeyboardInterrupt:
         print("\n[ENCERRADO] Servidor WebSocket finalizado pelo usuário.")
+
